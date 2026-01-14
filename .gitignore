@@ -39,3 +39,14 @@ tmpclaude-*
 *.db
 *.db-shm
 *.db-wal
+
+# Production secrets (NEVER commit!)
+.env.production
+certbot/
+nginx/ssl/
+nginx/nginx.current.conf
+
+# Docker volumes data
+postgres_data/
+bot_data/
+bot_logs/
