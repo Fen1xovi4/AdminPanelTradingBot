@@ -1,0 +1,30 @@
+{
+  "BotId": "8ff431be-ed87-4b10-adaa-1cbc76984561",
+  "BotName": "8ff431be-ed87-4b10-adaa-1cbc76984561",
+  "Exchange": "",
+  "Account": "",
+  "Status": {
+    "BotId": "8ff431be-ed87-4b10-adaa-1cbc76984561",
+    "BotName": "BitGet-KOL-ATTIC-2",
+    "Exchange": "BitGet-K",
+    "Account": "Attic-2",
+    "IsRunning": true,
+    "Status": "Running",
+    "Timestamp": "2026-01-13T22:11:38.7279983Z"
+  },
+  "Position": {
+    "BotId": "8ff431be-ed87-4b10-adaa-1cbc76984561",
+    "InPosition": true,
+    "EntryPrice": 0.233946666666,
+    "TakeProfit": 0.2280395000000000000000000000,
+    "StopLoss": 0,
+    "PositionSize": 405,
+    "CurrentPrice": 0.23793,
+    "UnrealizedPnL": -1.61325000027,
+    "PositionSide": "Short",
+    "AccountBalance": 63.38850324,
+    "Timestamp": "2026-01-13T23:29:40.3307074Z"
+  },
+  "StrategySignal": null,
+  "LastUpdate": "2026-01-13T23:29:40.3318473Z"
+}

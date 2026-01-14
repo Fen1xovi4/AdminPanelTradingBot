@@ -1,0 +1,25 @@
+{
+  "BotId": "test-bot-1",
+  "BotName": "Test Bot 1",
+  "Exchange": "ByBit-M",
+  "Account": "AiVerse",
+  "Status": {
+    "BotId": "test-bot-1",
+    "IsRunning": true,
+    "Status": "Running",
+    "Timestamp": "2026-01-03T12:00:00Z"
+  },
+  "Position": {
+    "BotId": "test-bot-1",
+    "InPosition": true,
+    "EntryPrice": 50000.0,
+    "TakeProfit": 51000.0,
+    "StopLoss": 49500.0,
+    "PositionSize": 0.1,
+    "CurrentPrice": 50100.0,
+    "UnrealizedPnL": 10.0,
+    "PositionSide": "Long",
+    "Timestamp": "2026-01-03T12:00:05Z"
+  },
+  "LastUpdate": "2026-01-03T12:00:05Z"
+}

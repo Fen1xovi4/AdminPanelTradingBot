@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(set VITE_API_URL=http://localhost:5001)",
+      "Bash(set VITE_APP_NAME=Bots For Trading)",
+      "Bash(npm run build:*)",
+      "Bash(docker build:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker logs:*)",
+      "Bash(dotnet ef migrations add:*)",
+      "Bash(dotnet tool install:*)"
+    ]
+  }
+}

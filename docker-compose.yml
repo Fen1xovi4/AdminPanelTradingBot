@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: botsfortrading-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-botsfortrading}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - botsfortrading-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-botsfortrading}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: botsfortrading-backend:latest
+    container_name: botsfortrading-api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-botsfortrading};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}"
+      JWT__Secret: ${JWT_SECRET:-your-super-secret-key-change-this-in-production-min-32-chars}
+      JWT__Issuer: ${JWT_ISSUER:-BotsForTradingAPI}
+      JWT__Audience: ${JWT_AUDIENCE:-BotsForTradingClient}
+      JWT__ExpiryMinutes: ${JWT_EXPIRY_MINUTES:-60}
+      JWT__RefreshTokenExpiryDays: ${JWT_REFRESH_TOKEN_EXPIRY_DAYS:-7}
+      CORS__Origins: ${CORS_ORIGINS:-http://localhost:3001}
+      Admin__Email: ${ADMIN_EMAIL:-admin@admin.local}
+      Admin__Password: ${ADMIN_PASSWORD:-Admin123!}
+    ports:
+      - "${BACKEND_PORT:-5001}:5000"
+    networks:
+      - botsfortrading-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    image: botsfortrading-frontend:latest
+    container_name: botsfortrading-web
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3001}:80"
+    networks:
+      - botsfortrading-network
+    depends_on:
+      - backend
+
+networks:
+  botsfortrading-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

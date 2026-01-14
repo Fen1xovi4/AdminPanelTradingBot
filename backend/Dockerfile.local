@@ -1,0 +1,17 @@
+# Runtime-only stage for pre-built application
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+
+# Install curl for healthcheck
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
+# Copy pre-built application
+COPY ./publish .
+
+EXPOSE 5000
+
+ENTRYPOINT ["dotnet", "BotsForTrading.Api.dll"]

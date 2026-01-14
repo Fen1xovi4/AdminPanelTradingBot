@@ -1,0 +1,14 @@
+{
+  "BotId": "test-bot-2",
+  "BotName": "Test Bot 2",
+  "Exchange": "ByBit-S",
+  "Account": "MARS 1.3",
+  "Status": {
+    "BotId": "test-bot-2",
+    "IsRunning": false,
+    "Status": "Stopped",
+    "Timestamp": "2026-01-03T11:55:00Z"
+  },
+  "Position": null,
+  "LastUpdate": "2026-01-03T11:55:00Z"
+}

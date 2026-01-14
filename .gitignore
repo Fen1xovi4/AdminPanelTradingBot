@@ -1,0 +1,41 @@
+# Environment
+.env
+.env.local
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+backend/bin/
+backend/obj/
+backend/**/bin/
+backend/**/obj/
+frontend/dist/
+frontend/build/
+frontend/node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Publish output
+**/publish/
+**/*publish/
+
+# Temp files
+tmpclaude-*
+*.tmp
+
+# Database
+*.db
+*.db-shm
+*.db-wal
