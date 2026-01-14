@@ -7,16 +7,16 @@ services:
     container_name: cryptopizza-db
     restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-botsfortrading}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - cryptopizza-network
+      - internal
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-botsfortrading}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,20 +29,21 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:5000
-      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-botsfortrading};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}"
       JWT__Secret: ${JWT_SECRET}
-      JWT__Issuer: ${JWT_ISSUER}
-      JWT__Audience: ${JWT_AUDIENCE}
-      JWT__ExpiryMinutes: ${JWT_EXPIRY_MINUTES}
-      JWT__RefreshTokenExpiryDays: ${JWT_REFRESH_TOKEN_EXPIRY_DAYS}
-      CORS__Origins: ${CORS_ORIGINS}
-      Admin__Email: ${ADMIN_EMAIL}
-      Admin__Password: ${ADMIN_PASSWORD}
+      JWT__Issuer: ${JWT_ISSUER:-CryptoPizzaAPI}
+      JWT__Audience: ${JWT_AUDIENCE:-CryptoPizzaClient}
+      JWT__ExpiryMinutes: ${JWT_EXPIRY_MINUTES:-60}
+      JWT__RefreshTokenExpiryDays: ${JWT_REFRESH_TOKEN_EXPIRY_DAYS:-7}
+      CORS__Origins: ${CORS_ORIGINS:-https://cryptopizza.pl}
+      Admin__Email: ${ADMIN_EMAIL:-admin@cryptopizza.pl}
+      Admin__Password: ${ADMIN_PASSWORD:-Admin123!}
     volumes:
       - bot_data:/app/Data
       - bot_logs:/app/logs
     networks:
-      - cryptopizza-network
+      - internal
+      - web
     depends_on:
       postgres:
         condition: service_healthy
@@ -51,48 +52,54 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      # API routes
+      - "traefik.http.routers.cryptopizza-api.rule=Host(`cryptopizza.pl`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.cryptopizza-api.entrypoints=websecure"
+      - "traefik.http.routers.cryptopizza-api.tls=true"
+      - "traefik.http.routers.cryptopizza-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.cryptopizza-api.loadbalancer.server.port=5000"
+      # Health check route
+      - "traefik.http.routers.cryptopizza-health.rule=Host(`cryptopizza.pl`) && Path(`/health`)"
+      - "traefik.http.routers.cryptopizza-health.entrypoints=websecure"
+      - "traefik.http.routers.cryptopizza-health.tls=true"
 
-  # Frontend (React + Nginx)
+  # Frontend (React)
   frontend:
     image: cryptopizza-frontend:latest
     container_name: cryptopizza-web
     restart: always
     networks:
-      - cryptopizza-network
+      - internal
+      - web
     depends_on:
       - backend
-
-  # Nginx Reverse Proxy with SSL
-  nginx:
-    image: nginx:alpine
-    container_name: cryptopizza-nginx
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-      - ./certbot/www:/var/www/certbot:ro
-      - ./certbot/conf:/etc/letsencrypt:ro
-    networks:
-      - cryptopizza-network
-    depends_on:
-      - frontend
-      - backend
-
-  # Certbot for SSL certificates
-  certbot:
-    image: certbot/certbot
-    container_name: cryptopizza-certbot
-    volumes:
-      - ./certbot/www:/var/www/certbot
-      - ./certbot/conf:/etc/letsencrypt
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      # Frontend routes (catch-all, lower priority)
+      - "traefik.http.routers.cryptopizza-web.rule=Host(`cryptopizza.pl`)"
+      - "traefik.http.routers.cryptopizza-web.entrypoints=websecure"
+      - "traefik.http.routers.cryptopizza-web.tls=true"
+      - "traefik.http.routers.cryptopizza-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.cryptopizza-web.priority=1"
+      - "traefik.http.services.cryptopizza-web.loadbalancer.server.port=80"
+      # WWW redirect
+      - "traefik.http.routers.cryptopizza-www.rule=Host(`www.cryptopizza.pl`)"
+      - "traefik.http.routers.cryptopizza-www.entrypoints=websecure"
+      - "traefik.http.routers.cryptopizza-www.tls=true"
+      - "traefik.http.routers.cryptopizza-www.middlewares=www-redirect"
+      - "traefik.http.middlewares.www-redirect.redirectregex.regex=^https://www\\.cryptopizza\\.pl/(.*)"
+      - "traefik.http.middlewares.www-redirect.redirectregex.replacement=https://cryptopizza.pl/$${1}"
+      - "traefik.http.middlewares.www-redirect.redirectregex.permanent=true"
 
 networks:
-  cryptopizza-network:
+  internal:
     driver: bridge
+  web:
+    external: true
 
 volumes:
   postgres_data:
