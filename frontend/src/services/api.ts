@@ -1,10 +1,11 @@
 import axios from 'axios'
 import { useAuthStore } from '@/stores/authStore'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001'
+// Relative path - works both locally (with proxy) and in production
+const API_BASE = '/api/v1'
 
 export const api = axios.create({
-  baseURL: `${API_URL}/api/v1`,
+  baseURL: API_BASE,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -38,7 +39,7 @@ api.interceptors.response.use(
           return Promise.reject(error)
         }
 
-        const response = await axios.post(`${API_URL}/api/v1/auth/refresh-token`, {
+        const response = await axios.post(`${API_BASE}/auth/refresh-token`, {
           refreshToken,
         })
 
