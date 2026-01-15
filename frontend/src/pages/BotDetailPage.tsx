@@ -224,7 +224,7 @@ export function BotDetailPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>{bot.name}</CardTitle>
+                <CardTitle>{botState?.botName || bot.name}</CardTitle>
                 <CardDescription>{bot.description}</CardDescription>
               </div>
               {!isBotOnline(botState?.lastUpdate) && (

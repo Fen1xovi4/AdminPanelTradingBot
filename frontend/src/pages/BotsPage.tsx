@@ -299,7 +299,7 @@ export function BotsPage() {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{bot.name}</CardTitle>
+                    <CardTitle className="text-lg">{botState?.botName || bot.name}</CardTitle>
                     <CardDescription className="mt-1">{bot.strategy}</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
