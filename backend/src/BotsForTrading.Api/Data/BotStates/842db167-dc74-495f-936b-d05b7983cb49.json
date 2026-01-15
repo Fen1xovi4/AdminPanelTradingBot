@@ -1,0 +1,30 @@
+{
+  "BotId": "842db167-dc74-495f-936b-d05b7983cb49",
+  "BotName": "BitGet - MAR - SOL",
+  "Exchange": "",
+  "Account": "",
+  "Status": {
+    "BotId": "842db167-dc74-495f-936b-d05b7983cb49",
+    "BotName": "BitGet - MAR - SOL",
+    "Exchange": "",
+    "Account": "",
+    "IsRunning": true,
+    "Status": "Running",
+    "Timestamp": "2026-01-15T13:52:25.9800731Z"
+  },
+  "Position": {
+    "BotId": "842db167-dc74-495f-936b-d05b7983cb49",
+    "InPosition": false,
+    "EntryPrice": 0,
+    "TakeProfit": 0,
+    "StopLoss": 0,
+    "PositionSize": 0,
+    "CurrentPrice": 0,
+    "UnrealizedPnL": 0,
+    "PositionSide": "",
+    "AccountBalance": 10.99138673,
+    "Timestamp": "2026-01-15T20:55:52.5763499Z"
+  },
+  "StrategySignal": null,
+  "LastUpdate": "2026-01-15T20:55:52.5824116Z"
+}

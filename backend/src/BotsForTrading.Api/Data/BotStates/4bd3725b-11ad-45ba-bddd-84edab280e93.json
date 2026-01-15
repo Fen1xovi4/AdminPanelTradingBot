@@ -1,8 +1,8 @@
 {
   "BotId": "4bd3725b-11ad-45ba-bddd-84edab280e93",
-  "BotName": "4bd3725b-11ad-45ba-bddd-84edab280e93",
-  "Exchange": "",
-  "Account": "",
+  "BotName": "BitGet-KOL-K2",
+  "Exchange": "BitGet-K",
+  "Account": "K-2",
   "Status": {
     "BotId": "4bd3725b-11ad-45ba-bddd-84edab280e93",
     "BotName": "BitGet-KOL-K2",
@@ -10,21 +10,21 @@
     "Account": "K-2",
     "IsRunning": true,
     "Status": "Running",
-    "Timestamp": "2026-01-13T22:11:40.2272823Z"
+    "Timestamp": "2026-01-15T13:52:59.9963838Z"
   },
   "Position": {
     "BotId": "4bd3725b-11ad-45ba-bddd-84edab280e93",
     "InPosition": true,
-    "EntryPrice": 0.4218,
-    "TakeProfit": 0.4322425,
+    "EntryPrice": 0.395533333334,
+    "TakeProfit": 0.4053533333333333333333333334,
     "StopLoss": 0,
-    "PositionSize": 18,
-    "CurrentPrice": 0.4219,
-    "UnrealizedPnL": 0.0018,
+    "PositionSize": 486,
+    "CurrentPrice": 0.3903,
+    "UnrealizedPnL": -2.543400000324,
     "PositionSide": "Long",
-    "AccountBalance": 57.89851198,
-    "Timestamp": "2026-01-13T23:29:41.7945067Z"
+    "AccountBalance": 57.70927769,
+    "Timestamp": "2026-01-15T20:55:51.6627163Z"
   },
   "StrategySignal": null,
-  "LastUpdate": "2026-01-13T23:29:41.7976755Z"
+  "LastUpdate": "2026-01-15T20:55:51.6700248Z"
 }

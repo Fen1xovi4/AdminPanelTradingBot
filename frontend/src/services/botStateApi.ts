@@ -2,6 +2,9 @@ import api from './api'
 
 export interface BotStatus {
   botId: string
+  botName?: string
+  exchange?: string
+  account?: string
   isRunning: boolean
   status: string
   timestamp: string

@@ -16,15 +16,18 @@ public class TradeHistoryController : ControllerBase
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUserService;
     private readonly ITradeHistoryFileService _tradeHistoryFileService;
+    private readonly IBotStatisticsService _botStatisticsService;
 
     public TradeHistoryController(
         IApplicationDbContext context,
         ICurrentUserService currentUserService,
-        ITradeHistoryFileService tradeHistoryFileService)
+        ITradeHistoryFileService tradeHistoryFileService,
+        IBotStatisticsService botStatisticsService)
     {
         _context = context;
         _currentUserService = currentUserService;
         _tradeHistoryFileService = tradeHistoryFileService;
+        _botStatisticsService = botStatisticsService;
     }
 
     /// <summary>
@@ -121,8 +124,11 @@ public class TradeHistoryController : ControllerBase
             ClosedAt = request.ClosedAt ?? DateTime.UtcNow
         };
 
-        // Save to file instead of database
+        // Save to file
         await _tradeHistoryFileService.SaveTradeAsync(tradeHistory);
+
+        // Recalculate bot statistics after saving the trade
+        await _botStatisticsService.RecalculateStatisticsAsync(bot.Id);
 
         return CreatedAtAction(
             nameof(GetByBotId),

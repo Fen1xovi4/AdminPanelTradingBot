@@ -35,6 +35,9 @@ public class DataSeeder
             // Seed admin user
             await SeedAdminUserAsync();
 
+            // Save admin user before creating bots (so we can find them by query)
+            await _context.SaveChangesAsync();
+
             // Seed test bots
             await SeedTestBotsAsync();
 
@@ -94,17 +97,18 @@ public class DataSeeder
             return;
         }
 
-        // Real bots with their actual GUID identifiers
+        // Real bots - names will be updated by TradingBot terminal when it connects
         var testBots = new List<TradingBot>
         {
             new TradingBot
             {
-                Name = "Real Bot 1",
-                Exchange = "Unknown",
-                Account = "Unknown",
+                Name = "BitGet - MAR - XRP",
+                Description = "XRP trading bot on Bitget MAR account",
+                Exchange = "Bitget",
+                Account = "MAR",
                 ExternalBotId = "4bd3725b-11ad-45ba-bddd-84edab280e93",
-                TradingPair = "ADA/USDT",
-                Strategy = "Automated",
+                TradingPair = "XRP/USDT",
+                Strategy = "EMA Deviation",
                 Status = "Active",
                 InitialBalance = 1000,
                 CurrentBalance = 1000,
@@ -113,12 +117,13 @@ public class DataSeeder
             },
             new TradingBot
             {
-                Name = "Real Bot 2",
-                Exchange = "Unknown",
-                Account = "Unknown",
+                Name = "BitGet-MAR-Attic-DOT",
+                Description = "DOT trading bot on Bitget MAR-Attic account",
+                Exchange = "Bitget",
+                Account = "MAR-Attic",
                 ExternalBotId = "06756bac-7520-47fe-8789-241720243522",
-                TradingPair = "Unknown",
-                Strategy = "Automated",
+                TradingPair = "DOT/USDT",
+                Strategy = "EMA Deviation",
                 Status = "Active",
                 InitialBalance = 1000,
                 CurrentBalance = 1000,
@@ -127,12 +132,13 @@ public class DataSeeder
             },
             new TradingBot
             {
-                Name = "Real Bot 3",
-                Exchange = "Unknown",
-                Account = "Unknown",
+                Name = "BitGet-KOL-ATTIC-2",
+                Description = "XLM trading bot on Bitget KOL-ATTIC account",
+                Exchange = "Bitget",
+                Account = "KOL-ATTIC",
                 ExternalBotId = "8ff431be-ed87-4b10-adaa-1cbc76984561",
-                TradingPair = "Unknown",
-                Strategy = "Automated",
+                TradingPair = "XLM/USDT",
+                Strategy = "EMA Deviation",
                 Status = "Active",
                 InitialBalance = 1000,
                 CurrentBalance = 1000,
@@ -141,12 +147,28 @@ public class DataSeeder
             },
             new TradingBot
             {
-                Name = "Real Bot 4",
-                Exchange = "Unknown",
-                Account = "Unknown",
+                Name = "BitGet-KOL-K2",
+                Description = "ADA trading bot on Bitget KOL account",
+                Exchange = "Bitget",
+                Account = "KOL",
                 ExternalBotId = "8f5780e4-639f-4650-b82b-70fb58f658f5",
-                TradingPair = "Unknown",
-                Strategy = "Automated",
+                TradingPair = "ADA/USDT",
+                Strategy = "EMA Deviation",
+                Status = "Active",
+                InitialBalance = 1000,
+                CurrentBalance = 1000,
+                UserId = admin.Id,
+                CreatedAt = DateTime.UtcNow
+            },
+            new TradingBot
+            {
+                Name = "BitGet - MAR - SOL",
+                Description = "SOL trading bot on Bitget MAR account",
+                Exchange = "Bitget",
+                Account = "MAR",
+                ExternalBotId = "",
+                TradingPair = "SOL/USDT",
+                Strategy = "EMA Deviation",
                 Status = "Active",
                 InitialBalance = 1000,
                 CurrentBalance = 1000,

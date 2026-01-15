@@ -108,7 +108,7 @@ export function DashboardPage() {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{botState?.botName || bot.name}</CardTitle>
+                    <CardTitle className="text-lg">{botState?.status?.botName || botState?.botName || bot.name}</CardTitle>
                     <CardDescription className="mt-1">{bot.strategy}</CardDescription>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -136,13 +136,12 @@ export function DashboardPage() {
                         <span className="text-muted-foreground">Balance</span>
                       </div>
                       <span className="font-semibold">
-                        ${realBalance.toFixed(2)}
+                        {isOnline ? `$${realBalance.toFixed(2)}` : '—'}
                       </span>
                     </div>
                     {!isOnline ? (
-                      <div className="text-xs text-red-500 flex items-center gap-1">
-                        <WifiOff className="h-3 w-3" />
-                        Данные недоступны
+                      <div className="text-xs text-muted-foreground">
+                        Bot stopped
                       </div>
                     ) : isPositionDataFresh && botState?.position?.accountBalance ? (
                       <div className="text-xs text-green-600">

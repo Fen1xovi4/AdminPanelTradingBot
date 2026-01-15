@@ -299,7 +299,7 @@ export function BotsPage() {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{botState?.botName || bot.name || `Bot #${bot.id}`}</CardTitle>
+                    <CardTitle className="text-lg">{botState?.status?.botName || botState?.botName || bot.name || `Bot #${bot.id}`}</CardTitle>
                     <CardDescription className="mt-1">{bot.strategy}</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
@@ -370,7 +370,7 @@ export function BotsPage() {
                         <span className={`font-medium ${
                           botState.position.positionSide === 'Long' ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {botState.position.positionSide} ${botState.position.positionSize}
+                          {botState.position.positionSide} ${(botState.position.positionSize * botState.position.currentPrice).toFixed(2)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-xs">

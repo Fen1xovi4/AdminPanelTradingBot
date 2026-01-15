@@ -224,7 +224,7 @@ export function BotDetailPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>{botState?.botName || bot.name || `Bot #${bot.id}`}</CardTitle>
+                <CardTitle>{botState?.status?.botName || botState?.botName || bot.name || `Bot #${bot.id}`}</CardTitle>
                 <CardDescription>{bot.description}</CardDescription>
               </div>
               {!isBotOnline(botState?.lastUpdate) && (
@@ -307,7 +307,7 @@ export function BotDetailPage() {
                         <p className={`text-lg font-semibold ${
                           position.positionSide === 'Long' ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {position.positionSide} ${position.positionSize}
+                          {position.positionSide} ${(position.positionSize * position.currentPrice).toFixed(2)}
                         </p>
                       </div>
                       <div className="p-4 bg-muted rounded-lg">

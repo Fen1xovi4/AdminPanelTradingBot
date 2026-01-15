@@ -36,6 +36,7 @@ builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddScoped<IBotStateService, BotStateService>();
 builder.Services.AddSingleton<ITradeHistoryFileService, TradeHistoryFileService>();
+builder.Services.AddScoped<IBotStatisticsService, BotStatisticsService>();
 
 // HTTP Context
 builder.Services.AddHttpContextAccessor();
@@ -149,6 +150,10 @@ using (var scope = app.Services.CreateScope())
 
     var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     await seeder.SeedAsync();
+
+    // Recalculate statistics for all bots on startup to ensure data is accurate
+    var statisticsService = scope.ServiceProvider.GetRequiredService<IBotStatisticsService>();
+    await statisticsService.RecalculateAllStatisticsAsync();
 }
 
 // Middleware pipeline

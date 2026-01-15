@@ -38,9 +38,15 @@ public class BotStateService : IBotStateService
             state.Status = status;
             state.LastUpdate = DateTime.UtcNow;
 
+            // Update BotName in state from status
+            if (!string.IsNullOrEmpty(status.BotName))
+            {
+                state.BotName = status.BotName;
+            }
+
             await SaveBotStateAsync(state);
 
-            // Update database if metadata is provided
+            // Update or create bot in database
             if (!string.IsNullOrEmpty(status.BotName) ||
                 !string.IsNullOrEmpty(status.Exchange) ||
                 !string.IsNullOrEmpty(status.Account))
@@ -50,16 +56,48 @@ public class BotStateService : IBotStateService
 
                 if (bot != null)
                 {
+                    // Update existing bot
                     if (!string.IsNullOrEmpty(status.BotName))
                         bot.Name = status.BotName;
                     if (!string.IsNullOrEmpty(status.Exchange))
                         bot.Exchange = status.Exchange;
                     if (!string.IsNullOrEmpty(status.Account))
                         bot.Account = status.Account;
+                    bot.LastActiveAt = DateTime.UtcNow;
 
                     await _context.SaveChangesAsync();
                     _logger.LogInformation("Updated bot metadata for {BotId}: Name={Name}, Exchange={Exchange}, Account={Account}",
                         status.BotId, status.BotName, status.Exchange, status.Account);
+                }
+                else
+                {
+                    // Create new bot automatically
+                    var adminUser = await _context.Users.FirstOrDefaultAsync(u => u.Role == "Admin");
+                    if (adminUser != null)
+                    {
+                        var newBot = new Core.Entities.TradingBot
+                        {
+                            Name = status.BotName ?? status.BotId,
+                            Description = $"Auto-created bot from terminal",
+                            Exchange = status.Exchange ?? "Unknown",
+                            Account = status.Account ?? "Unknown",
+                            ExternalBotId = status.BotId,
+                            TradingPair = "USDT",
+                            Strategy = "EMA Deviation",
+                            Status = status.IsRunning ? "Active" : "Stopped",
+                            InitialBalance = 0,
+                            CurrentBalance = 0,
+                            UserId = adminUser.Id,
+                            CreatedAt = DateTime.UtcNow,
+                            LastActiveAt = DateTime.UtcNow
+                        };
+
+                        _context.TradingBots.Add(newBot);
+                        await _context.SaveChangesAsync();
+
+                        _logger.LogInformation("Auto-created new bot {BotId}: Name={Name}, Exchange={Exchange}, Account={Account}",
+                            status.BotId, status.BotName, status.Exchange, status.Account);
+                    }
                 }
             }
 

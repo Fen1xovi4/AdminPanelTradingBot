@@ -1,8 +1,8 @@
 {
   "BotId": "06756bac-7520-47fe-8789-241720243522",
-  "BotName": "06756bac-7520-47fe-8789-241720243522",
-  "Exchange": "",
-  "Account": "",
+  "BotName": "BitGet-MAR-Attic-DOT",
+  "Exchange": "BitGet-M",
+  "Account": "Attic",
   "Status": {
     "BotId": "06756bac-7520-47fe-8789-241720243522",
     "BotName": "BitGet-MAR-Attic-DOT",
@@ -10,21 +10,21 @@
     "Account": "Attic",
     "IsRunning": true,
     "Status": "Running",
-    "Timestamp": "2026-01-13T22:11:37.3621256Z"
+    "Timestamp": "2026-01-15T17:51:18.9188511Z"
   },
   "Position": {
     "BotId": "06756bac-7520-47fe-8789-241720243522",
     "InPosition": true,
-    "EntryPrice": 2.10674074074,
-    "TakeProfit": 2.0856733333326,
+    "EntryPrice": 2.109,
+    "TakeProfit": 2.08791,
     "StopLoss": 0,
-    "PositionSize": 108,
-    "CurrentPrice": 2.287,
-    "UnrealizedPnL": -19.46800000008,
+    "PositionSize": 4,
+    "CurrentPrice": 2.104,
+    "UnrealizedPnL": 0.02,
     "PositionSide": "Short",
-    "AccountBalance": 66.05832768,
-    "Timestamp": "2026-01-13T23:29:38.9431118Z"
+    "AccountBalance": 89.49290044,
+    "Timestamp": "2026-01-15T20:55:50.5590679Z"
   },
   "StrategySignal": null,
-  "LastUpdate": "2026-01-13T23:29:38.945709Z"
+  "LastUpdate": "2026-01-15T20:55:50.5659924Z"
 }

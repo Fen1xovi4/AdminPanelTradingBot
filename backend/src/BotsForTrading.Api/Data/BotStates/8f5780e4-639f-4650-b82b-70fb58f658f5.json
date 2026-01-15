@@ -1,8 +1,8 @@
 {
   "BotId": "8f5780e4-639f-4650-b82b-70fb58f658f5",
-  "BotName": "8f5780e4-639f-4650-b82b-70fb58f658f5",
-  "Exchange": "",
-  "Account": "",
+  "BotName": "BitGet - MAR - XRP",
+  "Exchange": "BitGet-M",
+  "Account": "BrickLab",
   "Status": {
     "BotId": "8f5780e4-639f-4650-b82b-70fb58f658f5",
     "BotName": "BitGet - MAR - XRP",
@@ -10,21 +10,21 @@
     "Account": "BrickLab",
     "IsRunning": true,
     "Status": "Running",
-    "Timestamp": "2026-01-13T22:11:32.1266568Z"
+    "Timestamp": "2026-01-15T13:52:48.019506Z"
   },
   "Position": {
     "BotId": "8f5780e4-639f-4650-b82b-70fb58f658f5",
-    "InPosition": true,
-    "EntryPrice": 2.0604,
-    "TakeProfit": 1.936776,
-    "StopLoss": 2.184024,
-    "PositionSize": 4,
-    "CurrentPrice": 2.1638,
-    "UnrealizedPnL": -0.4136,
-    "PositionSide": "Short",
-    "AccountBalance": 12.65287924,
-    "Timestamp": "2026-01-13T23:29:38.7356601Z"
+    "InPosition": false,
+    "EntryPrice": 0,
+    "TakeProfit": 0,
+    "StopLoss": 0,
+    "PositionSize": 0,
+    "CurrentPrice": 0,
+    "UnrealizedPnL": 0,
+    "PositionSide": "",
+    "AccountBalance": 10.99138673,
+    "Timestamp": "2026-01-15T20:55:49.6423972Z"
   },
   "StrategySignal": null,
-  "LastUpdate": "2026-01-13T23:29:38.7385372Z"
+  "LastUpdate": "2026-01-15T20:55:49.6481252Z"
 }
