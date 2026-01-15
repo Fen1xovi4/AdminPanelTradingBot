@@ -48,8 +48,12 @@ builder.Services.AddApiVersioning(options =>
     options.DefaultApiVersion = new ApiVersion(1, 0);
 }).AddMvc();
 
-// Controllers
-builder.Services.AddControllers();
+// Controllers with camelCase JSON serialization
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
 
 // FluentValidation
 builder.Services.AddFluentValidationAutoValidation();

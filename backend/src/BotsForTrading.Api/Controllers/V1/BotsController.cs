@@ -174,6 +174,7 @@ public class BotsController : ControllerBase
             Description = bot.Description,
             Strategy = bot.Strategy,
             Exchange = bot.Exchange,
+            Account = bot.Account,
             TradingPair = bot.TradingPair,
             ExternalBotId = bot.ExternalBotId,
             InitialBalance = bot.InitialBalance,

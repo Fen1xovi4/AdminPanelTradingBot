@@ -7,6 +7,7 @@ public class TradingBotDto
     public string Description { get; set; } = string.Empty;
     public string Strategy { get; set; } = string.Empty;
     public string Exchange { get; set; } = string.Empty;
+    public string? Account { get; set; }
     public string TradingPair { get; set; } = string.Empty;
     public string? ExternalBotId { get; set; }
     public decimal InitialBalance { get; set; }

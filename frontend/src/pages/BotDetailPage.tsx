@@ -224,7 +224,7 @@ export function BotDetailPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>{botState?.botName || bot.name}</CardTitle>
+                <CardTitle>{botState?.botName || bot.name || `Bot #${bot.id}`}</CardTitle>
                 <CardDescription>{bot.description}</CardDescription>
               </div>
               {!isBotOnline(botState?.lastUpdate) && (
@@ -249,7 +249,7 @@ export function BotDetailPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Exchange</p>
-                <p className="text-lg font-semibold">{bot.exchange}</p>
+                <p className="text-lg font-semibold">{bot.exchange || 'Unknown'}</p>
               </div>
               {bot.account && (
                 <div>
@@ -259,7 +259,7 @@ export function BotDetailPage() {
               )}
               <div>
                 <p className="text-sm text-muted-foreground">Trading Pair</p>
-                <p className="text-lg font-semibold">{bot.tradingPair}</p>
+                <p className="text-lg font-semibold">{bot.tradingPair || 'Unknown'}</p>
               </div>
             </div>
 

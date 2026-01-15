@@ -299,7 +299,7 @@ export function BotsPage() {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{botState?.botName || bot.name}</CardTitle>
+                    <CardTitle className="text-lg">{botState?.botName || bot.name || `Bot #${bot.id}`}</CardTitle>
                     <CardDescription className="mt-1">{bot.strategy}</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
@@ -315,7 +315,7 @@ export function BotsPage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Exchange</span>
-                    <span className="font-medium">{bot.exchange}</span>
+                    <span className="font-medium">{bot.exchange || 'Unknown'}</span>
                   </div>
                   {bot.account && (
                     <div className="flex items-center justify-between text-sm">
@@ -325,7 +325,7 @@ export function BotsPage() {
                   )}
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Trading Pair</span>
-                    <span className="font-medium">{bot.tradingPair}</span>
+                    <span className="font-medium">{bot.tradingPair || 'Unknown'}</span>
                   </div>
                   <div className="pt-3 border-t">
                     <div className="flex items-center justify-between text-sm mb-2">
