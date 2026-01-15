@@ -1,0 +1,81 @@
+version: '3.8'
+
+# Development configuration with hot reload and API proxy
+# Usage: docker-compose -f docker-compose.dev.yml up --build
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: botsfortrading-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-botsfortrading}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - ./infra/scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-botsfortrading}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: botsfortrading-api-dev
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-botsfortrading};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}"
+      JWT__Secret: ${JWT_SECRET:-your-super-secret-key-change-this-in-production-min-32-chars}
+      JWT__Issuer: ${JWT_ISSUER:-BotsForTradingAPI}
+      JWT__Audience: ${JWT_AUDIENCE:-BotsForTradingClient}
+      JWT__ExpiryMinutes: ${JWT_EXPIRY_MINUTES:-60}
+      JWT__RefreshTokenExpiryDays: ${JWT_REFRESH_TOKEN_EXPIRY_DAYS:-7}
+      CORS__Origins: ${CORS_ORIGINS:-http://localhost:3001}
+      Admin__Email: ${ADMIN_EMAIL:-admin@admin.local}
+      Admin__Password: ${ADMIN_PASSWORD:-Admin123!}
+    ports:
+      - "${BACKEND_PORT:-5001}:5000"
+    volumes:
+      - ./backend/src/BotsForTrading.Api/Data:/app/Data
+      - ./backend/src/BotsForTrading.Api/logs:/app/logs
+    networks:
+      - dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: botsfortrading-web-dev
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3001}:80"
+    networks:
+      - dev-network
+    depends_on:
+      - backend
+
+networks:
+  dev-network:
+    driver: bridge
+
+volumes:
+  postgres_data_dev:

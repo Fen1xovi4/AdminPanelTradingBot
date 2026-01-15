@@ -65,6 +65,8 @@ services:
       - "traefik.http.routers.cryptopizza-health.rule=Host(`cryptopizza.pl`) && Path(`/health`)"
       - "traefik.http.routers.cryptopizza-health.entrypoints=websecure"
       - "traefik.http.routers.cryptopizza-health.tls=true"
+      - "traefik.http.routers.cryptopizza-health.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.cryptopizza-health.service=cryptopizza-api"
 
   # Frontend (React)
   frontend:
