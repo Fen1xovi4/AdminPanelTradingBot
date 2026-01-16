@@ -121,6 +121,53 @@ public class BotStateService : IBotStateService
             state.LastUpdate = DateTime.UtcNow;
 
             await SaveBotStateAsync(state);
+
+            // Auto-create bot in database if it doesn't exist
+            // This ensures bots are created even if the initial /status call failed
+            var existingBot = await _context.TradingBots
+                .FirstOrDefaultAsync(b => b.ExternalBotId == position.BotId);
+
+            if (existingBot == null && !string.IsNullOrEmpty(state.BotName) && state.BotName != position.BotId)
+            {
+                // Bot doesn't exist but we have metadata from state file (from previous /status call)
+                var adminUser = await _context.Users.FirstOrDefaultAsync(u => u.Role == "Admin");
+                if (adminUser != null)
+                {
+                    var newBot = new Core.Entities.TradingBot
+                    {
+                        Name = state.BotName,
+                        Description = "Auto-created bot from position update",
+                        Exchange = state.Status?.Exchange ?? "Unknown",
+                        Account = state.Status?.Account ?? "Unknown",
+                        ExternalBotId = position.BotId,
+                        TradingPair = state.Status?.TradingPair ?? "Unknown",
+                        Strategy = "EMA Deviation",
+                        Status = "Active",
+                        InitialBalance = 0,
+                        CurrentBalance = position.AccountBalance,
+                        UserId = adminUser.Id,
+                        CreatedAt = DateTime.UtcNow,
+                        LastActiveAt = DateTime.UtcNow
+                    };
+
+                    _context.TradingBots.Add(newBot);
+                    await _context.SaveChangesAsync();
+
+                    _logger.LogInformation("Auto-created bot from position update {BotId}: Name={Name}",
+                        position.BotId, state.BotName);
+                }
+            }
+            else if (existingBot != null)
+            {
+                // Update LastActiveAt for existing bot
+                existingBot.LastActiveAt = DateTime.UtcNow;
+                if (position.AccountBalance > 0)
+                {
+                    existingBot.CurrentBalance = position.AccountBalance;
+                }
+                await _context.SaveChangesAsync();
+            }
+
             _logger.LogInformation("Updated bot position for {BotId}", position.BotId);
         }
         catch (Exception ex)

@@ -388,7 +388,9 @@ export function BotDetailPage() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Current Balance</p>
-                  <p className="text-2xl font-bold">${bot.currentBalance.toFixed(2)}</p>
+                  <p className={`text-2xl font-bold ${!isBotOnline(botState?.lastUpdate) ? 'text-muted-foreground' : ''}`}>
+                    {isBotOnline(botState?.lastUpdate) ? `$${bot.currentBalance.toFixed(2)}` : '—'}
+                  </p>
                 </div>
               </div>
             </CardContent>
