@@ -108,7 +108,8 @@ public class BotStateReporter : IDisposable
     /// <param name="botName">Name of the bot</param>
     /// <param name="exchange">Exchange name (e.g., "BitGet-M")</param>
     /// <param name="account">Account name (e.g., "BrickLab")</param>
-    public async Task<bool> ReportBotStartedAsync(string botName, string exchange, string account)
+    /// <param name="tradingPair">Trading pair (e.g., "XRP/USDT")</param>
+    public async Task<bool> ReportBotStartedAsync(string botName, string exchange, string account, string? tradingPair = null)
     {
         try
         {
@@ -118,6 +119,7 @@ public class BotStateReporter : IDisposable
                 BotName = botName,
                 Exchange = exchange,
                 Account = account,
+                TradingPair = tradingPair,
                 IsRunning = true,
                 Status = "Running",
                 Timestamp = DateTime.UtcNow

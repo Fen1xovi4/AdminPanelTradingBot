@@ -7,6 +7,16 @@ import { BarChart3, TrendingUp, Activity } from 'lucide-react'
 import { botsApi } from '@/services/botsApi'
 import { botStateApi, BotState } from '@/services/botStateApi'
 import { tradeHistoryApi } from '@/services/tradeHistoryApi'
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+} from 'recharts'
 
 type ProfitPeriod = 7 | 30 | 90 | 'all'
 
@@ -109,6 +119,35 @@ export function AnalyticsPage() {
       }))
   }, [trades, bots])
 
+  // Cumulative PnL chart data
+  const chartData = useMemo(() => {
+    if (!trades || trades.length === 0) return []
+
+    // Sort trades by closedAt date
+    const sortedTrades = [...trades].sort(
+      (a, b) => new Date(a.closedAt).getTime() - new Date(b.closedAt).getTime()
+    )
+
+    // Calculate cumulative PnL
+    let cumulativePnL = 0
+    return sortedTrades.map((trade) => {
+      cumulativePnL += trade.realizedPnL
+      return {
+        date: new Date(trade.closedAt).toLocaleDateString('ru-RU', {
+          day: '2-digit',
+          month: '2-digit',
+        }),
+        fullDate: new Date(trade.closedAt).toLocaleDateString('ru-RU', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        }),
+        pnl: Number(cumulativePnL.toFixed(2)),
+        tradePnL: Number(trade.realizedPnL.toFixed(2)),
+      }
+    })
+  }, [trades])
+
   const isLoading = botsLoading || tradesLoading
 
   if (isLoading) {
@@ -203,15 +242,77 @@ export function AnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Performance Chart</CardTitle>
-              <CardDescription>Your trading performance over time</CardDescription>
+              <CardDescription>Cumulative realized PnL across all bots</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                <div className="text-center">
-                  <BarChart3 className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p>Chart visualization will be available soon</p>
+              {chartData.length > 0 ? (
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="colorPnlPositive" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorPnlNegative" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 12 }}
+                        className="text-muted-foreground"
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis
+                        tick={{ fontSize: 12 }}
+                        className="text-muted-foreground"
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => `$${value}`}
+                      />
+                      <Tooltip
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload
+                            return (
+                              <div className="bg-popover border rounded-lg shadow-lg p-3">
+                                <p className="text-sm text-muted-foreground">{data.fullDate}</p>
+                                <p className={`text-sm font-semibold ${data.pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                  Total: ${data.pnl.toFixed(2)}
+                                </p>
+                                <p className={`text-xs ${data.tradePnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                  Trade: {data.tradePnL >= 0 ? '+' : ''}${data.tradePnL.toFixed(2)}
+                                </p>
+                              </div>
+                            )
+                          }
+                          return null
+                        }}
+                      />
+                      <ReferenceLine y={0} stroke="#888" strokeDasharray="3 3" />
+                      <Area
+                        type="monotone"
+                        dataKey="pnl"
+                        stroke={chartData[chartData.length - 1]?.pnl >= 0 ? '#22c55e' : '#ef4444'}
+                        strokeWidth={2}
+                        fill={chartData[chartData.length - 1]?.pnl >= 0 ? 'url(#colorPnlPositive)' : 'url(#colorPnlNegative)'}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 </div>
-              </div>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                  <div className="text-center">
+                    <BarChart3 className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>No trading data yet</p>
+                    <p className="text-sm mt-1">Complete some trades to see the chart</p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

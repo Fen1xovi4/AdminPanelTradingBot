@@ -63,11 +63,13 @@ public class BotStateService : IBotStateService
                         bot.Exchange = status.Exchange;
                     if (!string.IsNullOrEmpty(status.Account))
                         bot.Account = status.Account;
+                    if (!string.IsNullOrEmpty(status.TradingPair))
+                        bot.TradingPair = status.TradingPair;
                     bot.LastActiveAt = DateTime.UtcNow;
 
                     await _context.SaveChangesAsync();
-                    _logger.LogInformation("Updated bot metadata for {BotId}: Name={Name}, Exchange={Exchange}, Account={Account}",
-                        status.BotId, status.BotName, status.Exchange, status.Account);
+                    _logger.LogInformation("Updated bot metadata for {BotId}: Name={Name}, Exchange={Exchange}, Account={Account}, TradingPair={TradingPair}",
+                        status.BotId, status.BotName, status.Exchange, status.Account, status.TradingPair);
                 }
                 else
                 {
@@ -82,7 +84,7 @@ public class BotStateService : IBotStateService
                             Exchange = status.Exchange ?? "Unknown",
                             Account = status.Account ?? "Unknown",
                             ExternalBotId = status.BotId,
-                            TradingPair = "USDT",
+                            TradingPair = status.TradingPair ?? "Unknown",
                             Strategy = "EMA Deviation",
                             Status = status.IsRunning ? "Active" : "Stopped",
                             InitialBalance = 0,
@@ -95,8 +97,8 @@ public class BotStateService : IBotStateService
                         _context.TradingBots.Add(newBot);
                         await _context.SaveChangesAsync();
 
-                        _logger.LogInformation("Auto-created new bot {BotId}: Name={Name}, Exchange={Exchange}, Account={Account}",
-                            status.BotId, status.BotName, status.Exchange, status.Account);
+                        _logger.LogInformation("Auto-created new bot {BotId}: Name={Name}, Exchange={Exchange}, Account={Account}, TradingPair={TradingPair}",
+                            status.BotId, status.BotName, status.Exchange, status.Account, status.TradingPair);
                     }
                 }
             }
