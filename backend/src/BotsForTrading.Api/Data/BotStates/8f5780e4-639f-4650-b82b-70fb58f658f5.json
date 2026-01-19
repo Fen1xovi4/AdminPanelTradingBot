@@ -8,9 +8,10 @@
     "BotName": "BitGet - MAR - XRP",
     "Exchange": "BitGet-M",
     "Account": "BrickLab",
+    "TradingPair": "XRP/USDT",
     "IsRunning": true,
     "Status": "Running",
-    "Timestamp": "2026-01-15T13:52:48.019506Z"
+    "Timestamp": "2026-01-19T01:55:49.0004672Z"
   },
   "Position": {
     "BotId": "8f5780e4-639f-4650-b82b-70fb58f658f5",
@@ -22,9 +23,9 @@
     "CurrentPrice": 0,
     "UnrealizedPnL": 0,
     "PositionSide": "",
-    "AccountBalance": 10.99138673,
-    "Timestamp": "2026-01-15T20:55:49.6423972Z"
+    "AccountBalance": 48.08238157,
+    "Timestamp": "2026-01-19T11:20:35.5575852Z"
   },
   "StrategySignal": null,
-  "LastUpdate": "2026-01-15T20:55:49.6481252Z"
+  "LastUpdate": "2026-01-19T11:20:35.5586433Z"
 }

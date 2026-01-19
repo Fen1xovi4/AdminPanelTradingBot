@@ -16,8 +16,8 @@ export function SettingsPage() {
     <Layout>
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold text-foreground">Settings</h2>
-          <p className="text-muted-foreground mt-1">Manage your account and preferences</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Settings</h2>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage your account and preferences</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

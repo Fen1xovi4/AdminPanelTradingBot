@@ -67,12 +67,12 @@ export function DashboardPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-foreground">Trading Bots</h2>
-            <p className="text-muted-foreground mt-1">Manage and monitor your trading bots</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Trading Bots</h2>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage and monitor your trading bots</p>
           </div>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
+          <Button onClick={() => setIsCreateDialogOpen(true)} className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Create Bot
           </Button>

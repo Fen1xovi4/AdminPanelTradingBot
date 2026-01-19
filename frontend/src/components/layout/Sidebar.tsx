@@ -36,7 +36,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-64 modern-sidebar min-h-[calc(100vh-64px)] overflow-y-auto">
+    <aside className="hidden md:block w-64 modern-sidebar min-h-[calc(100vh-64px)] overflow-y-auto">
       <div className="p-4">
         <div className="mb-6">
           <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3">

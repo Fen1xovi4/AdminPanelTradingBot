@@ -67,3 +67,44 @@
     @apply bg-white p-4 rounded-lg border border-border;
   }
 }
+
+/* Mobile-specific improvements */
+@layer utilities {
+  /* Improve touch targets on mobile */
+  @media (max-width: 640px) {
+    .modern-nav-item {
+      @apply py-3;
+    }
+  }
+
+  /* Safe area padding for notched devices */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Prevent text selection on buttons for mobile */
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Smooth scrolling for the entire page */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Hide scrollbar on mobile sidebar but keep functionality */
+  .modern-sidebar {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 768px) {
+    .modern-sidebar::-webkit-scrollbar {
+      width: 0;
+      background: transparent;
+    }
+  }
+}

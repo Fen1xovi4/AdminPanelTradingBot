@@ -127,37 +127,41 @@ export function BotDetailPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <Button variant="ghost" onClick={() => navigate('/')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <Button variant="ghost" onClick={() => navigate('/')} className="px-2 sm:px-3">
+            <ArrowLeft className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Back to Dashboard</span>
+            <span className="sm:hidden">Back</span>
           </Button>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             {bot.status === 'Active' ? (
               <Button
                 variant="outline"
                 onClick={() => updateMutation.mutate('Paused')}
                 disabled={updateMutation.isPending}
+                className="flex-1 sm:flex-none"
               >
-                <Pause className="h-4 w-4 mr-2" />
-                Pause
+                <Pause className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Pause</span>
               </Button>
             ) : (
               <Button
                 onClick={() => updateMutation.mutate('Active')}
                 disabled={updateMutation.isPending}
+                className="flex-1 sm:flex-none"
               >
-                <Play className="h-4 w-4 mr-2" />
-                Start
+                <Play className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Start</span>
               </Button>
             )}
             <Button
               variant="destructive"
               onClick={() => deleteMutation.mutate()}
               disabled={deleteMutation.isPending}
+              className="flex-1 sm:flex-none"
             >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
+              <Trash2 className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Delete</span>
             </Button>
           </div>
         </div>

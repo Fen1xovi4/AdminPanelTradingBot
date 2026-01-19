@@ -1,9 +1,10 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Layout } from '@/components/layout/Layout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
-import { BarChart3, TrendingUp, Activity } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { BarChart3, TrendingUp, Activity, Search, X, Check } from 'lucide-react'
 import { botsApi } from '@/services/botsApi'
 import { botStateApi, BotState } from '@/services/botStateApi'
 import { tradeHistoryApi } from '@/services/tradeHistoryApi'
@@ -23,6 +24,13 @@ type ProfitPeriod = 7 | 30 | 90 | 'all'
 export function AnalyticsPage() {
   const [botStates, setBotStates] = useState<BotState[]>([])
   const [profitPeriod, setProfitPeriod] = useState<ProfitPeriod>('all')
+
+  // Bot filter state
+  const [botSearchText, setBotSearchText] = useState('')
+  const [selectedBotIds, setSelectedBotIds] = useState<Set<number>>(new Set())
+  const [isBotFilterActive, setIsBotFilterActive] = useState(false)
+  const [isBotDropdownOpen, setIsBotDropdownOpen] = useState(false)
+  const botDropdownRef = useRef<HTMLDivElement>(null)
 
   // Fetch bots
   const { data: bots, isLoading: botsLoading } = useQuery({
@@ -52,31 +60,81 @@ export function AnalyticsPage() {
     return () => clearInterval(interval)
   }, [])
 
-  // Calculate analytics
+  // Close bot dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (botDropdownRef.current && !botDropdownRef.current.contains(event.target as Node)) {
+        setIsBotDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Bot search results for dropdown (only existing bots)
+  const botSearchResults = useMemo(() => {
+    if (!bots) return []
+    if (!botSearchText.trim()) return bots
+    const search = botSearchText.toLowerCase()
+    return bots.filter(bot => bot.name.toLowerCase().includes(search))
+  }, [bots, botSearchText])
+
+  // Filter trades by selected period and bots
+  const filteredTrades = useMemo(() => {
+    if (!trades) return []
+
+    let result = trades
+
+    // Filter by selected bots
+    if (isBotFilterActive && selectedBotIds.size > 0) {
+      result = result.filter(t => selectedBotIds.has(t.botId))
+    }
+
+    // Filter by period
+    if (profitPeriod !== 'all') {
+      const now = new Date()
+      const cutoffDate = new Date(now.getTime() - profitPeriod * 24 * 60 * 60 * 1000)
+      result = result.filter(t => new Date(t.closedAt) >= cutoffDate)
+    }
+
+    return result
+  }, [trades, profitPeriod, isBotFilterActive, selectedBotIds])
+
+  // Bot filter handlers
+  const handleToggleBot = (botId: number) => {
+    setSelectedBotIds(prev => {
+      const next = new Set(prev)
+      if (next.has(botId)) {
+        next.delete(botId)
+      } else {
+        next.add(botId)
+      }
+      return next
+    })
+  }
+
+  const handleApplyBotFilter = () => {
+    setIsBotFilterActive(true)
+    setIsBotDropdownOpen(false)
+  }
+
+  const handleResetBotFilter = () => {
+    setSelectedBotIds(new Set())
+    setBotSearchText('')
+    setIsBotFilterActive(false)
+    setIsBotDropdownOpen(false)
+  }
+
+  // Calculate analytics from filtered trades
   const analytics = useMemo(() => {
-    const totalTrades = trades?.length || 0
-    const winningTrades = trades?.filter(t => t.status === 'Success').length || 0
-    const totalProfit = trades?.reduce((sum, t) => sum + t.realizedPnL, 0) || 0
+    const totalTrades = filteredTrades.length
+    const winningTrades = filteredTrades.filter(t => t.status === 'Success').length
+    const totalProfit = filteredTrades.reduce((sum, t) => sum + t.realizedPnL, 0)
     const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0
     const activeBots = botStates.filter(s => s.status?.isRunning).length
 
     return { totalTrades, winningTrades, totalProfit, winRate, activeBots }
-  }, [trades, botStates])
-
-  // Calculate filtered profit by period
-  const filteredProfit = useMemo(() => {
-    if (!trades) return 0
-    if (profitPeriod === 'all') {
-      return trades.reduce((sum, t) => sum + t.realizedPnL, 0)
-    }
-
-    const now = new Date()
-    const cutoffDate = new Date(now.getTime() - profitPeriod * 24 * 60 * 60 * 1000)
-
-    return trades
-      .filter(t => new Date(t.closedAt) >= cutoffDate)
-      .reduce((sum, t) => sum + t.realizedPnL, 0)
-  }, [trades, profitPeriod])
+  }, [filteredTrades, botStates])
 
   // Top performing bots (by total profit from trades)
   const topBots = useMemo(() => {
@@ -119,12 +177,12 @@ export function AnalyticsPage() {
       }))
   }, [trades, bots])
 
-  // Cumulative PnL chart data
+  // Cumulative PnL chart data (uses filtered trades)
   const chartData = useMemo(() => {
-    if (!trades || trades.length === 0) return []
+    if (filteredTrades.length === 0) return []
 
     // Sort trades by closedAt date
-    const sortedTrades = [...trades].sort(
+    const sortedTrades = [...filteredTrades].sort(
       (a, b) => new Date(a.closedAt).getTime() - new Date(b.closedAt).getTime()
     )
 
@@ -146,7 +204,7 @@ export function AnalyticsPage() {
         tradePnL: Number(trade.realizedPnL.toFixed(2)),
       }
     })
-  }, [trades])
+  }, [filteredTrades])
 
   const isLoading = botsLoading || tradesLoading
 
@@ -164,9 +222,95 @@ export function AnalyticsPage() {
     <Layout>
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold text-foreground">Analytics</h2>
-          <p className="text-muted-foreground mt-1">Track your trading performance and insights</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Analytics</h2>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">Track your trading performance and insights</p>
         </div>
+
+        {/* Bot Filter */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                {/* Search input with dropdown */}
+                <div className="relative flex-1" ref={botDropdownRef}>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Filter by bot name..."
+                      value={botSearchText}
+                      onChange={(e) => {
+                        setBotSearchText(e.target.value)
+                        setIsBotDropdownOpen(true)
+                      }}
+                      onFocus={() => setIsBotDropdownOpen(true)}
+                      className="w-full pl-10 pr-4 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+
+                  {/* Dropdown with checkboxes */}
+                  {isBotDropdownOpen && botSearchResults.length > 0 && (
+                    <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                      {botSearchResults.map((bot) => (
+                        <label
+                          key={bot.id}
+                          className="flex items-center gap-3 px-3 py-2 hover:bg-muted cursor-pointer"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedBotIds.has(bot.id)}
+                            onChange={() => handleToggleBot(bot.id)}
+                            className="h-4 w-4 rounded border-input"
+                          />
+                          <span className="text-sm flex-1">{bot.name}</span>
+                          {selectedBotIds.has(bot.id) && (
+                            <Check className="h-4 w-4 text-primary" />
+                          )}
+                        </label>
+                      ))}
+                      {selectedBotIds.size > 0 && (
+                        <div className="px-3 py-2 border-t border-border text-xs text-muted-foreground">
+                          Selected: {selectedBotIds.size}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleApplyBotFilter}
+                    disabled={selectedBotIds.size === 0}
+                    className="whitespace-nowrap"
+                  >
+                    Apply ({selectedBotIds.size})
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleResetBotFilter}
+                    disabled={!isBotFilterActive && selectedBotIds.size === 0}
+                    className="whitespace-nowrap"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Reset
+                  </Button>
+                </div>
+              </div>
+
+              {/* Active filter indicator */}
+              {isBotFilterActive && selectedBotIds.size > 0 && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>
+                    Filtering by {selectedBotIds.size} bot{selectedBotIds.size > 1 ? 's' : ''}
+                    {bots && ` • ${filteredTrades.length} trades`}
+                  </span>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
@@ -189,8 +333,8 @@ export function AnalyticsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className={`text-2xl font-bold ${filteredProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                ${filteredProfit.toFixed(2)}
+              <div className={`text-2xl font-bold ${analytics.totalProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                ${analytics.totalProfit.toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 {profitPeriod === 'all' ? 'All time' : `Last ${profitPeriod} days`}
@@ -206,7 +350,7 @@ export function AnalyticsPage() {
             <CardContent>
               <div className="text-2xl font-bold">{analytics.totalTrades}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {analytics.winningTrades} winning
+                {analytics.winningTrades} winning ({profitPeriod === 'all' ? 'all time' : `${profitPeriod}d`})
               </p>
             </CardContent>
           </Card>
@@ -220,7 +364,9 @@ export function AnalyticsPage() {
               <div className={`text-2xl font-bold ${analytics.winRate >= 50 ? 'text-green-600' : 'text-orange-600'}`}>
                 {analytics.winRate.toFixed(1)}%
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Success rate</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {profitPeriod === 'all' ? 'All time' : `Last ${profitPeriod} days`}
+              </p>
             </CardContent>
           </Card>
 
@@ -242,7 +388,9 @@ export function AnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Performance Chart</CardTitle>
-              <CardDescription>Cumulative realized PnL across all bots</CardDescription>
+              <CardDescription>
+                Cumulative realized PnL ({profitPeriod === 'all' ? 'all time' : `last ${profitPeriod} days`})
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {chartData.length > 0 ? (

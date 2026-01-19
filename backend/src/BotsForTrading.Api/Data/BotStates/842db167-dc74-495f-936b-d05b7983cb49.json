@@ -6,25 +6,26 @@
   "Status": {
     "BotId": "842db167-dc74-495f-936b-d05b7983cb49",
     "BotName": "BitGet - MAR - SOL",
-    "Exchange": "",
-    "Account": "",
+    "Exchange": "BitGet-M",
+    "Account": "BrickLab",
+    "TradingPair": "SOL/USDT",
     "IsRunning": true,
     "Status": "Running",
-    "Timestamp": "2026-01-15T13:52:25.9800731Z"
+    "Timestamp": "2026-01-19T01:55:54.8268479Z"
   },
   "Position": {
     "BotId": "842db167-dc74-495f-936b-d05b7983cb49",
-    "InPosition": false,
-    "EntryPrice": 0,
-    "TakeProfit": 0,
-    "StopLoss": 0,
-    "PositionSize": 0,
-    "CurrentPrice": 0,
-    "UnrealizedPnL": 0,
-    "PositionSide": "",
-    "AccountBalance": 10.99138673,
-    "Timestamp": "2026-01-15T20:55:52.5763499Z"
+    "InPosition": true,
+    "EntryPrice": 134.007,
+    "TakeProfit": 130.656825,
+    "StopLoss": 136.017105,
+    "PositionSize": 0.7,
+    "CurrentPrice": 133.642,
+    "UnrealizedPnL": 0.2555,
+    "PositionSide": "Short",
+    "AccountBalance": 48.08238157,
+    "Timestamp": "2026-01-19T11:20:36.3781387Z"
   },
   "StrategySignal": null,
-  "LastUpdate": "2026-01-15T20:55:52.5824116Z"
+  "LastUpdate": "2026-01-19T11:20:36.3789003Z"
 }

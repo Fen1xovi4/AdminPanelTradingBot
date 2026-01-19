@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { botsApi } from '@/services/botsApi'
@@ -7,51 +7,21 @@ import { Layout } from '@/components/layout/Layout'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
-import { Plus, Activity, DollarSign, Bot, TrendingUp, TrendingDown, WifiOff } from 'lucide-react'
+import { Plus, Activity, DollarSign, Bot, TrendingUp, TrendingDown, WifiOff, Search, X, Check } from 'lucide-react'
 import { CreateBotDialog } from '@/components/bots/CreateBotDialog'
 import { isBotOnline } from '@/lib/utils'
-
-// Mock data structure for exchanges and accounts
-const EXCHANGES_DATA = [
-  {
-    id: 'bybit-m',
-    name: 'ByBit-M',
-    accounts: [
-      { id: 'aiverse', name: 'AiVerse' },
-    ],
-  },
-  {
-    id: 'bybit-s',
-    name: 'ByBit-S',
-    accounts: [
-      { id: 'mars-1-3', name: 'MARS 1.3' },
-    ],
-  },
-  {
-    id: 'bitget-k',
-    name: 'BitGet-K',
-    accounts: [
-      { id: 'attic-2', name: 'Attic-2' },
-      { id: 'k-2', name: 'K-2' },
-    ],
-  },
-  {
-    id: 'bitget-m',
-    name: 'BitGet-M',
-    accounts: [
-      { id: 'attic', name: 'Attic' },
-      { id: 'bricklab', name: 'BrickLab' },
-      { id: 'mar', name: 'MAR' },
-    ],
-  },
-]
 
 export function BotsPage() {
   const navigate = useNavigate()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [selectedExchange, setSelectedExchange] = useState<string>('all')
-  const [selectedAccount, setSelectedAccount] = useState<string>('all')
   const [botStates, setBotStates] = useState<Record<string, BotState>>({})
+
+  // New filter state
+  const [searchText, setSearchText] = useState('')
+  const [selectedBotIds, setSelectedBotIds] = useState<Set<number>>(new Set())
+  const [isFilterActive, setIsFilterActive] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const { data: bots, isLoading } = useQuery({
     queryKey: ['bots'],
@@ -87,49 +57,55 @@ export function BotsPage() {
     return () => clearInterval(interval)
   }, [])
 
-  // Get available accounts based on selected exchange
-  const availableAccounts = useMemo(() => {
-    if (selectedExchange === 'all') {
-      return EXCHANGES_DATA.flatMap(exchange => exchange.accounts)
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false)
+      }
     }
-    const exchange = EXCHANGES_DATA.find(ex => ex.id === selectedExchange)
-    return exchange?.accounts || []
-  }, [selectedExchange])
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
-  // Reset account selection when exchange changes
-  const handleExchangeChange = (value: string) => {
-    setSelectedExchange(value)
-    setSelectedAccount('all')
-  }
+  // Search results for dropdown
+  const searchResults = useMemo(() => {
+    if (!bots || !searchText.trim()) return bots || []
+    const search = searchText.toLowerCase()
+    return bots.filter(bot => bot.name.toLowerCase().includes(search))
+  }, [bots, searchText])
 
-  // Filter bots based on selected exchange and account
+  // Filter displayed bots based on selection
   const filteredBots = useMemo(() => {
     if (!bots) return []
+    if (!isFilterActive || selectedBotIds.size === 0) return bots
+    return bots.filter(bot => selectedBotIds.has(bot.id))
+  }, [bots, selectedBotIds, isFilterActive])
 
-    let filtered = bots
+  // Handlers
+  const handleToggleBot = (botId: number) => {
+    setSelectedBotIds(prev => {
+      const next = new Set(prev)
+      if (next.has(botId)) {
+        next.delete(botId)
+      } else {
+        next.add(botId)
+      }
+      return next
+    })
+  }
 
-    // Filter by exchange
-    if (selectedExchange !== 'all') {
-      const exchangeName = EXCHANGES_DATA.find(ex => ex.id === selectedExchange)?.name
-      filtered = filtered.filter(bot => {
-        const botExchange = bot.exchange?.toLowerCase().replace(/\s+/g, '-')
-        const selectedExch = exchangeName?.toLowerCase().replace(/\s+/g, '-')
-        return botExchange === selectedExch
-      })
-    }
+  const handleApplyFilter = () => {
+    setIsFilterActive(true)
+    setIsDropdownOpen(false)
+  }
 
-    // Filter by account
-    if (selectedAccount !== 'all') {
-      const accountName = availableAccounts.find(acc => acc.id === selectedAccount)?.name
-      filtered = filtered.filter(bot => {
-        const botAccount = bot.account?.toLowerCase()
-        const selectedAcc = accountName?.toLowerCase()
-        return botAccount === selectedAcc
-      })
-    }
-
-    return filtered
-  }, [bots, selectedExchange, selectedAccount, availableAccounts])
+  const handleResetFilter = () => {
+    setSelectedBotIds(new Set())
+    setSearchText('')
+    setIsFilterActive(false)
+    setIsDropdownOpen(false)
+  }
 
   if (isLoading) {
     return (
@@ -147,12 +123,12 @@ export function BotsPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-foreground">All Bots</h2>
-            <p className="text-muted-foreground mt-1">Manage and monitor all your trading bots</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground">All Bots</h2>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage and monitor all your trading bots</p>
           </div>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
+          <Button onClick={() => setIsCreateDialogOpen(true)} className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Create Bot
           </Button>
@@ -184,74 +160,85 @@ export function BotsPage() {
           </Card>
         </div>
 
+        {/* Filter by name */}
         <Card>
           <CardContent className="pt-6">
             <div className="space-y-4">
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-foreground">Exchange</h3>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => handleExchangeChange('all')}
-                    className={`
-                      px-4 py-2 rounded-md text-sm font-medium transition-all
-                      ${selectedExchange === 'all'
-                        ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                      }
-                    `}
+              <div className="flex flex-col sm:flex-row gap-3">
+                {/* Search input with dropdown */}
+                <div className="relative flex-1" ref={dropdownRef}>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Search by bot name..."
+                      value={searchText}
+                      onChange={(e) => {
+                        setSearchText(e.target.value)
+                        setIsDropdownOpen(true)
+                      }}
+                      onFocus={() => setIsDropdownOpen(true)}
+                      className="w-full pl-10 pr-4 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+
+                  {/* Dropdown with checkboxes */}
+                  {isDropdownOpen && searchResults.length > 0 && (
+                    <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                      {searchResults.map((bot) => (
+                        <label
+                          key={bot.id}
+                          className="flex items-center gap-3 px-3 py-2 hover:bg-muted cursor-pointer"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedBotIds.has(bot.id)}
+                            onChange={() => handleToggleBot(bot.id)}
+                            className="h-4 w-4 rounded border-input"
+                          />
+                          <span className="text-sm flex-1">{bot.name}</span>
+                          {selectedBotIds.has(bot.id) && (
+                            <Check className="h-4 w-4 text-primary" />
+                          )}
+                        </label>
+                      ))}
+                      {selectedBotIds.size > 0 && (
+                        <div className="px-3 py-2 border-t border-border text-xs text-muted-foreground">
+                          Selected: {selectedBotIds.size}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleApplyFilter}
+                    disabled={selectedBotIds.size === 0}
+                    className="whitespace-nowrap"
                   >
-                    All Exchanges
-                  </button>
-                  {EXCHANGES_DATA.map((exchange) => (
-                    <button
-                      key={exchange.id}
-                      onClick={() => handleExchangeChange(exchange.id)}
-                      className={`
-                        px-4 py-2 rounded-md text-sm font-medium transition-all
-                        ${selectedExchange === exchange.id
-                          ? 'bg-primary text-primary-foreground shadow-sm'
-                          : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                        }
-                      `}
-                    >
-                      {exchange.name}
-                    </button>
-                  ))}
+                    Apply ({selectedBotIds.size})
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleResetFilter}
+                    disabled={!isFilterActive && selectedBotIds.size === 0}
+                    className="whitespace-nowrap"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Reset
+                  </Button>
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-foreground">Account</h3>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => setSelectedAccount('all')}
-                    className={`
-                      px-4 py-2 rounded-md text-sm font-medium transition-all
-                      ${selectedAccount === 'all'
-                        ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                      }
-                    `}
-                  >
-                    All Accounts
-                  </button>
-                  {availableAccounts.map((account) => (
-                    <button
-                      key={account.id}
-                      onClick={() => setSelectedAccount(account.id)}
-                      className={`
-                        px-4 py-2 rounded-md text-sm font-medium transition-all
-                        ${selectedAccount === account.id
-                          ? 'bg-primary text-primary-foreground shadow-sm'
-                          : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                        }
-                      `}
-                    >
-                      {account.name}
-                    </button>
-                  ))}
+              {/* Active filter indicator */}
+              {isFilterActive && selectedBotIds.size > 0 && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>Showing {selectedBotIds.size} of {bots?.length || 0} bots</span>
                 </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>

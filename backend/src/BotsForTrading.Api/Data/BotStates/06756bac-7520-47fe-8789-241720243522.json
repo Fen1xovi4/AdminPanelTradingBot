@@ -8,23 +8,24 @@
     "BotName": "BitGet-MAR-Attic-DOT",
     "Exchange": "BitGet-M",
     "Account": "Attic",
+    "TradingPair": "DOT/USDT",
     "IsRunning": true,
     "Status": "Running",
-    "Timestamp": "2026-01-15T17:51:18.9188511Z"
+    "Timestamp": "2026-01-19T01:55:50.0869661Z"
   },
   "Position": {
     "BotId": "06756bac-7520-47fe-8789-241720243522",
     "InPosition": true,
-    "EntryPrice": 2.109,
-    "TakeProfit": 2.08791,
+    "EntryPrice": 1.973,
+    "TakeProfit": 1.95327,
     "StopLoss": 0,
-    "PositionSize": 4,
-    "CurrentPrice": 2.104,
-    "UnrealizedPnL": 0.02,
+    "PositionSize": 5,
+    "CurrentPrice": 1.973,
+    "UnrealizedPnL": 0,
     "PositionSide": "Short",
-    "AccountBalance": 89.49290044,
-    "Timestamp": "2026-01-15T20:55:50.5590679Z"
+    "AccountBalance": 103.3281856,
+    "Timestamp": "2026-01-19T11:20:36.6835097Z"
   },
   "StrategySignal": null,
-  "LastUpdate": "2026-01-15T20:55:50.5659924Z"
+  "LastUpdate": "2026-01-19T11:20:36.6841174Z"
 }

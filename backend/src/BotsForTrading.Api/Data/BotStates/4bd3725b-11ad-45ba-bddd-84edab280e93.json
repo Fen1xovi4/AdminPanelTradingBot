@@ -8,23 +8,24 @@
     "BotName": "BitGet-KOL-K2",
     "Exchange": "BitGet-K",
     "Account": "K-2",
+    "TradingPair": "ADA/USDT",
     "IsRunning": true,
     "Status": "Running",
-    "Timestamp": "2026-01-15T13:52:59.9963838Z"
+    "Timestamp": "2026-01-19T01:55:53.1425485Z"
   },
   "Position": {
     "BotId": "4bd3725b-11ad-45ba-bddd-84edab280e93",
-    "InPosition": true,
-    "EntryPrice": 0.395533333334,
-    "TakeProfit": 0.4053533333333333333333333334,
+    "InPosition": false,
+    "EntryPrice": 0,
+    "TakeProfit": 0,
     "StopLoss": 0,
-    "PositionSize": 486,
-    "CurrentPrice": 0.3903,
-    "UnrealizedPnL": -2.543400000324,
-    "PositionSide": "Long",
-    "AccountBalance": 57.70927769,
-    "Timestamp": "2026-01-15T20:55:51.6627163Z"
+    "PositionSize": 0,
+    "CurrentPrice": 0,
+    "UnrealizedPnL": 0,
+    "PositionSide": "",
+    "AccountBalance": 59.15803215,
+    "Timestamp": "2026-01-19T11:20:34.7315237Z"
   },
   "StrategySignal": null,
-  "LastUpdate": "2026-01-15T20:55:51.6700248Z"
+  "LastUpdate": "2026-01-19T11:20:34.7323014Z"
 }

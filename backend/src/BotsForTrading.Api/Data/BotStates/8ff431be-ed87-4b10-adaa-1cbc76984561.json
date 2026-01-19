@@ -8,23 +8,24 @@
     "BotName": "BitGet-KOL-ATTIC-2",
     "Exchange": "BitGet-K",
     "Account": "Attic-2",
+    "TradingPair": "XLM/USDT",
     "IsRunning": true,
     "Status": "Running",
-    "Timestamp": "2026-01-15T17:51:20.2923823Z"
+    "Timestamp": "2026-01-19T01:55:51.3687505Z"
   },
   "Position": {
     "BotId": "8ff431be-ed87-4b10-adaa-1cbc76984561",
     "InPosition": true,
-    "EntryPrice": 0.22995,
-    "TakeProfit": 0.22420125,
+    "EntryPrice": 0.213526666666,
+    "TakeProfit": 0.2083055000000000000000000000,
     "StopLoss": 0,
-    "PositionSize": 43,
-    "CurrentPrice": 0.22525,
-    "UnrealizedPnL": 0.2021,
+    "PositionSize": 144,
+    "CurrentPrice": 0.21432,
+    "UnrealizedPnL": -0.114240000096,
     "PositionSide": "Short",
-    "AccountBalance": 67.24941705,
-    "Timestamp": "2026-01-15T20:55:51.9291654Z"
+    "AccountBalance": 86.55692151,
+    "Timestamp": "2026-01-19T11:20:37.9591936Z"
   },
   "StrategySignal": null,
-  "LastUpdate": "2026-01-15T20:55:51.935233Z"
+  "LastUpdate": "2026-01-19T11:20:37.9598857Z"
 }
