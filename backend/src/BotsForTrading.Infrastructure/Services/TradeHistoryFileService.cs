@@ -25,8 +25,9 @@ public class TradeHistoryFileService : ITradeHistoryFileService
         _logger = logger;
 
         // Create data directory in the application root
+        // Use "Data" (capital D) to match Docker volume mount path
         var baseDirectory = AppContext.BaseDirectory;
-        _dataDirectory = Path.Combine(baseDirectory, "data", "trade-history");
+        _dataDirectory = Path.Combine(baseDirectory, "Data", "trade-history");
 
         if (!Directory.Exists(_dataDirectory))
         {
