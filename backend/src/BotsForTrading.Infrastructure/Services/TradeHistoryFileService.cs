@@ -168,6 +168,38 @@ public class TradeHistoryFileService : ITradeHistoryFileService
         }
     }
 
+    /// <summary>
+    /// Delete all trades for a specific bot (removes the JSON file)
+    /// </summary>
+    public async Task DeleteTradesForBotAsync(int botId)
+    {
+        await _fileLock.WaitAsync();
+        try
+        {
+            var fileName = GetFileNameForBot(botId);
+            var filePath = Path.Combine(_dataDirectory, fileName);
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+                _logger.LogInformation("Deleted trade history file for bot {BotId}: {FilePath}", botId, filePath);
+            }
+            else
+            {
+                _logger.LogInformation("No trade history file found for bot {BotId}", botId);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting trade history file for bot {BotId}", botId);
+            throw;
+        }
+        finally
+        {
+            _fileLock.Release();
+        }
+    }
+
     private static string GetFileNameForBot(int botId)
     {
         return $"bot_{botId}_trades.json";

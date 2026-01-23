@@ -15,15 +15,18 @@ public class BotsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUserService;
+    private readonly ITradeHistoryFileService _tradeHistoryFileService;
     private readonly ILogger<BotsController> _logger;
 
     public BotsController(
         IApplicationDbContext context,
         ICurrentUserService currentUserService,
+        ITradeHistoryFileService tradeHistoryFileService,
         ILogger<BotsController> logger)
     {
         _context = context;
         _currentUserService = currentUserService;
+        _tradeHistoryFileService = tradeHistoryFileService;
         _logger = logger;
     }
 
@@ -157,10 +160,13 @@ public class BotsController : ControllerBase
             return Forbid();
         }
 
+        // Delete trade history file first
+        await _tradeHistoryFileService.DeleteTradesForBotAsync(id);
+
         _context.TradingBots.Remove(bot);
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation("Bot {BotId} deleted by user {UserId}", bot.Id, _currentUserService.UserId);
+        _logger.LogInformation("Bot {BotId} deleted by user {UserId} (including trade history)", bot.Id, _currentUserService.UserId);
 
         return NoContent();
     }

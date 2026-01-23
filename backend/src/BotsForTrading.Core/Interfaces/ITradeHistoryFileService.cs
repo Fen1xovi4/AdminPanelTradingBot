@@ -26,4 +26,9 @@ public interface ITradeHistoryFileService
     /// Get all trades from all bots
     /// </summary>
     Task<List<TradeHistory>> GetAllTradesAsync();
+
+    /// <summary>
+    /// Delete all trades for a specific bot (removes the JSON file)
+    /// </summary>
+    Task DeleteTradesForBotAsync(int botId);
 }
