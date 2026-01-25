@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Spinner } from '@/components/ui/spinner'
 import { Plus, TrendingUp, TrendingDown, Activity, DollarSign, Bot, WifiOff } from 'lucide-react'
 import { CreateBotDialog } from '@/components/bots/CreateBotDialog'
+import { BotsPositionTable } from '@/components/bots/BotsPositionTable'
 import { isBotOnline } from '@/lib/utils'
 
 export function DashboardPage() {
@@ -190,6 +191,12 @@ export function DashboardPage() {
             </Card>
           )})}
         </div>
+
+        {bots && bots.length > 0 && (
+          <div className="mt-8">
+            <BotsPositionTable bots={bots} botStates={botStates} />
+          </div>
+        )}
 
         {bots?.length === 0 && (
           <Card>
