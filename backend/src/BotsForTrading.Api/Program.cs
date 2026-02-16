@@ -37,6 +37,7 @@ builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddScoped<IBotStateService, BotStateService>();
 builder.Services.AddSingleton<ITradeHistoryFileService, TradeHistoryFileService>();
 builder.Services.AddScoped<IBotStatisticsService, BotStatisticsService>();
+builder.Services.AddScoped<IPublicAnalyticsService, PublicAnalyticsService>();
 
 // HTTP Context
 builder.Services.AddHttpContextAccessor();

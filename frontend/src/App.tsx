@@ -4,11 +4,27 @@ import { Toaster } from '@/components/ui/toaster'
 import { LoginPage } from '@/pages/LoginPage'
 import { RegisterPage } from '@/pages/RegisterPage'
 import { DashboardPage } from '@/pages/DashboardPage'
+import { PublicDashboardPage } from '@/pages/PublicDashboardPage'
 import { BotsPage } from '@/pages/BotsPage'
 import { BotDetailPage } from '@/pages/BotDetailPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
+import { useAuthStore } from '@/stores/authStore'
+
+function RootPage() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  if (!isAuthenticated) {
+    return <PublicDashboardPage />
+  }
+
+  return (
+    <ProtectedRoute>
+      <DashboardPage />
+    </ProtectedRoute>
+  )
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,14 +42,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/" element={<RootPage />} />
           <Route
             path="/bots"
             element={
